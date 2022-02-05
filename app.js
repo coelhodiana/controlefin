@@ -19,23 +19,6 @@ app.get("/transacoes", (req, res) => {
     res.send(transacoes);
   });
 });
-/* 
-valor: { 
-    type: String, 
-    required: true,
-  },
-  tipo: {
-    type: String,
-    required: true,
-  },
-  descricao: {
-    type: String,
-  },
-  dataInclusao: {
-    type: String,
-    required: true
-  }
-*/
 
 app.post("/transacoes", (req, res) => {
   let valor = req.body.valor;
