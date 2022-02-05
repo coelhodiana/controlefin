@@ -1,41 +1,79 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require("express");
+const app = express();
+const port = 3000;
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const bodyParser = require("body-parser");
 
-var app = express();
+const { mongoose } = require("./db/mongoose");
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+const { Transacoes } = require("./db/models");
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.get("/", (req, res) => {
+  res.send(`Hello World!`);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.get("/transacoes", (req, res) => {
+  Transacoes.find({}).then((transacoes) => {
+    res.send(transacoes);
+  });
+});
+/* 
+valor: { 
+    type: String, 
+    required: true,
+  },
+  tipo: {
+    type: String,
+    required: true,
+  },
+  descricao: {
+    type: String,
+  },
+  dataInclusao: {
+    type: String,
+    required: true
+  }
+*/
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+app.post("/transacoes", (req, res) => {
+  let valor = req.body.valor;
+  let tipo = req.body.tipo;
+  let descricao = req.body.descricao;
+  let dataInclusao = req.body.dataInclusao;
+  
+  let newTransacao = new Transacoes({
+    valor,
+    tipo,
+    descricao,
+    dataInclusao
+  });
+
+  newTransacao.save().then((transacaoDoc) => {
+    res.send(transacaoDoc);
+  });
 });
 
-module.exports = app;
+app.patch("/transacoes/:id", (req, res) => {
+  Transacoes.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      $set: req.body,
+    }
+  ).then(() => {
+    res.sendStatus(200);
+  });
+});
+
+app.delete("/transacoes/:id", (req, res) => {
+  Transacoes.findByIdAndDelete({ _id: req.params.id }).then(
+    (removedTransacoesDoc) => {
+      res.send(removedTransacoesDoc);
+    }
+  );
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
