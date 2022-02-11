@@ -10,6 +10,19 @@ const { Transacoes } = require("./db/models");
 
 app.use(bodyParser.json());
 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send(`Hello World!`);
 });
@@ -25,16 +38,22 @@ app.post("/transacoes", (req, res) => {
   let tipo = req.body.tipo;
   let descricao = req.body.descricao;
   let dataInclusao = req.body.dataInclusao;
-  
+
   let newTransacao = new Transacoes({
     valor,
     tipo,
     descricao,
-    dataInclusao
+    dataInclusao,
   });
 
   newTransacao.save().then((transacaoDoc) => {
     res.send(transacaoDoc);
+  });
+});
+
+app.get("/transacoes/:id", (req, res) => {
+  Transacoes.findOne({ _id: req.params.id }).then((transacoes) => {
+    res.send(transacoes);
   });
 });
 
