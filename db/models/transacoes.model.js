@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const TransacoesSchema = new mongoose.Schema({
-  valor: { 
-    type: Number, 
-    get: v => (v/100).toFixed(2),
-    set: v => v*100,
+  valor: {
+    type: Number,
+    get: (v) => (v / 100).toFixed(2),
+    set: (v) => v * 100,
     required: true,
   },
   tipo: {
@@ -16,8 +16,8 @@ const TransacoesSchema = new mongoose.Schema({
   },
   dataInclusao: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const Transacoes = mongoose.model("Transacoes", TransacoesSchema);
